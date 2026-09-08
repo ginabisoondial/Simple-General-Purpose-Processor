@@ -1,0 +1,50 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
+entity ALU is
+port( Clock : in std_logic; --input clock signal
+      A :in unsigned(7 downto 0); --8-bit inputs from latches A and B
+      B : in unsigned(7 downto 0); --8-bit student ID from FSM
+      OP : in unsigned(5 downto 0); --6-bit selector for Operation from Decoder
+      Neg: out std_logic; --is the result negative? Set=for 8-bit output
+      R1 : out unsigned(3 downto 0); -- lower 4-bits of 8-bit Result Output
+      R2 : out unsigned(3 downto 0)); -- higher 4-bits of 8-bit Result Output
+end ALU;
+architecture calculation of ALU is --temporary signal declarations.
+signal Reg1,Reg2:unsigned(7 downto 0) := (others => '0');
+signal Reg4 : unsigned (7 to 7);
+begin
+Reg1 <= A; --temporary store A in Reg1 local variable
+Reg2 <= B; --temporary store B in Reg2 local variable
+process(Clk,OP)
+begin
+    if(rising_edge(Clock)) THEN --Do the calculation @ positive edge of clock cycle.
+        case OP is
+            WHEN "000000000001" => A + B;
+                -- Do Addition for Reg1 and Reg2
+            WHEN"000000000010"=> A + (NOT B);
+                --Do Subtraction
+                --Do shift of test if required.
+            WHEN "000000000100" => NOT A;
+                -- Do Inverse
+            WHEN "000000001000" => A NAND B;
+                --Do Boolean NAND
+            WHEN "000000010000" => A NOR B;
+                --Do Boolean NOR
+            WHEN "000000100000" => A AND B;
+                --Do Boolean AND
+            WHEN "000001000000" => A OR B;
+                --Do Boolean OR
+            WHEN "000010000000" => A XOR B;
+                --Do Boolean XOR
+            WHEN "000100000000" => A XNOR B;
+                --Do Boolean XNOR
+            WHEN OTHERS => null;
+                --Don’t care, do nothing
+        end case;
+    end if;
+end process;
+R1 <= Result(7 downto 0); --Since the output seven segments can
+R2 <= Result(7 downto 4); -- only 4-bits, split the 8-bit to two 4-bits.
+end calculation;
